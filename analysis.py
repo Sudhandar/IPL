@@ -8,22 +8,18 @@ matches = matches[['id', 'season', 'city', 'date', 'team1', 'team2', 'toss_winne
        'win_by_wickets', 'player_of_match', 'venue']]
 
 
-rcb = matches[(matches['team1']=='Royal Challengers Bangalore')|(matches['team2']=='Royal Challengers Bangalore')]
-csk = matches[(matches['team1']=='Chennai Super Kings')|(matches['team2']=='Chennai Super Kings')]
+test = balls[:1000]
 
-rcb_win = rcb[rcb['winner'] == 'Royal Challengers Bangalore']
-rcb_lost = rcb[rcb['winner'] != 'Royal Challengers Bangalore']
-#
-csk_win = csk[csk['winner'] == 'Chennai Super Kings']
-csk_lost = csk[csk['winner'] != 'Chennai Super Kings'] 
+runs = balls.groupby('batsman')['batsman_runs'].transform('sum')
+runs = pd.merge(balls,runs,left_index = True, right_index = True, how = 'inner')
+runs = runs[['batsman','batsman_runs_y']].drop_duplicates()
+runs.columns = ['batsman','runs']
 
-rcb_los_mom = pd.DataFrame(rcb_lost['player_of_match'].value_counts(ascending=False))
-csk_win_mom = pd.DataFrame(csk_win['player_of_match'].value_counts(ascending=False))
-
-rcb_los_toss = pd.DataFrame(rcb_lost['toss_winner'].value_counts(ascending=False))
-csk_los_toss = pd.DataFrame(csk_lost['toss_winner'].value_counts(ascending=False))
-
-rcb_loss 
+balls_faced = balls.groupby('batsman')['batsman'].transform('count')
+balls_faced = pd.merge(balls,balls_faced,left_index = True, right_index = True, how = 'inner')
+balls_faced = balls_faced[['batsman_x','batsman_y']].drop_duplicates()
+balls_faced.columns = ['batsman','balls_faced']
 
 
-
+batsman = pd.merge(runs,balls_faced,on='batsman',how='inner')
+batsman['strike_rate'] = (batsman['runs']/batsman['balls_faced'])*100
