@@ -23,3 +23,5 @@ balls_faced.columns = ['batsman','balls_faced']
 
 batsman = pd.merge(runs,balls_faced,on='batsman',how='inner')
 batsman['strike_rate'] = (batsman['runs']/batsman['balls_faced'])*100
+
+batsman
